@@ -5,6 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор</title>
     <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --calculator-bg: #ffffff;
+            --text-color: #333333;
+            --display-bg: #1a1a1a;
+            --display-color: #ffffff;
+            --button-bg: #f0f0f0;
+            --button-text: #333333;
+            --button-hover-bg: #e0e0e0;
+            --operator-bg: #667eea;
+            --operator-hover-bg: #5568d3;
+            --equals-bg: #764ba2;
+            --equals-hover-bg: #653a8a;
+            --clear-bg: #ff6b6b;
+            --clear-hover-bg: #ee5a5a;
+            --calculator-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-theme {
+            --bg-gradient: linear-gradient(135deg, #141e30 0%, #243b55 100%);
+            --calculator-bg: #1f1f2b;
+            --text-color: #f5f5f5;
+            --display-bg: #050505;
+            --display-color: #f5f5f5;
+            --button-bg: #2a2a3a;
+            --button-text: #f5f5f5;
+            --button-hover-bg: #3a3a4f;
+            --operator-bg: #4b6cb7;
+            --operator-hover-bg: #3b5694;
+            --equals-bg: #512e90;
+            --equals-hover-bg: #3d2170;
+            --clear-bg: #d84b5b;
+            --clear-hover-bg: #c3404f;
+            --calculator-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -17,22 +53,24 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-gradient);
             padding: 20px;
+            color: var(--text-color);
         }
 
         .calculator {
-            background: #ffffff;
+            background: var(--calculator-bg);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--calculator-shadow);
             padding: 30px;
             max-width: 400px;
             width: 100%;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .display {
-            background: #1a1a1a;
-            color: #ffffff;
+            background: var(--display-bg);
+            color: var(--display-color);
             font-size: 2.5rem;
             padding: 20px;
             text-align: right;
@@ -53,7 +91,7 @@
         }
 
         button {
-            background: #f0f0f0;
+            background: var(--button-bg);
             border: none;
             border-radius: 10px;
             font-size: 1.5rem;
@@ -61,11 +99,11 @@
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 600;
-            color: #333;
+            color: var(--button-text);
         }
 
         button:hover {
-            background: #e0e0e0;
+            background: var(--button-hover-bg);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
@@ -76,68 +114,85 @@
         }
 
         .operator {
-            background: #667eea;
+            background: var(--operator-bg);
             color: #ffffff;
         }
 
         .operator:hover {
-            background: #5568d3;
+            background: var(--operator-hover-bg);
         }
 
         .equals {
-            background: #764ba2;
+            background: var(--equals-bg);
             color: #ffffff;
         }
 
         .equals:hover {
-            background: #653a8a;
+            background: var(--equals-hover-bg);
         }
 
         .clear {
-            background: #ff6b6b;
+            background: var(--clear-bg);
             color: #ffffff;
         }
 
         .clear:hover {
-            background: #ee5a5a;
+            background: var(--clear-hover-bg);
         }
 
         .zero {
             grid-column: span 2;
         }
+
+        .theme-toggle {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .theme-toggle button {
+            font-size: 1rem;
+            padding: 10px 16px;
+            border-radius: 999px;
+            box-shadow: none;
+        }
     </style>
 </head>
 <body>
     <div class="calculator">
+        <div class="theme-toggle">
+            <button id="theme-toggle" aria-pressed="false">Тёмная тема</button>
+        </div>
         <div class="display" id="display">0</div>
         <div class="buttons">
             <button class="clear" onclick="clearDisplay()">C</button>
             <button class="operator" onclick="appendOperator('/')">/</button>
             <button class="operator" onclick="appendOperator('*')">×</button>
             <button class="operator" onclick="deleteLast()">⌫</button>
-            
+
             <button onclick="appendNumber('7')">7</button>
             <button onclick="appendNumber('8')">8</button>
             <button onclick="appendNumber('9')">9</button>
             <button class="operator" onclick="appendOperator('-')">-</button>
-            
+
             <button onclick="appendNumber('4')">4</button>
             <button onclick="appendNumber('5')">5</button>
             <button onclick="appendNumber('6')">6</button>
             <button class="operator" onclick="appendOperator('+')">+</button>
-            
+
             <button onclick="appendNumber('1')">1</button>
             <button onclick="appendNumber('2')">2</button>
             <button onclick="appendNumber('3')">3</button>
             <button class="equals" onclick="calculate()" rowspan="2">=</button>
-            
+
             <button class="zero" onclick="appendNumber('0')">0</button>
             <button onclick="appendDecimal()">.</button>
         </div>
     </div>
 
     <script>
-        let display = document.getElementById('display');
+        const display = document.getElementById('display');
+        const themeToggleButton = document.getElementById('theme-toggle');
         let currentInput = '0';
         let shouldResetDisplay = false;
 
@@ -150,7 +205,7 @@
                 currentInput = '0';
                 shouldResetDisplay = false;
             }
-            
+
             if (currentInput === '0') {
                 currentInput = number;
             } else {
@@ -164,7 +219,7 @@
                 currentInput = '0';
                 shouldResetDisplay = false;
             }
-            
+
             if (!currentInput.includes('.')) {
                 currentInput += '.';
                 updateDisplay();
@@ -175,7 +230,7 @@
             if (shouldResetDisplay) {
                 shouldResetDisplay = false;
             }
-            
+
             const lastChar = currentInput[currentInput.length - 1];
             if (['+', '-', '*', '/'].includes(lastChar)) {
                 currentInput = currentInput.slice(0, -1) + operator;
@@ -187,25 +242,23 @@
 
         function calculate() {
             try {
-                // Заменяем × на * для вычисления
-                let expression = currentInput.replace(/×/g, '*');
-                
-                // Проверяем на деление на ноль
+                const expression = currentInput.replace(/×/g, '*');
+
                 if (expression.includes('/0') && !expression.includes('/0.')) {
                     currentInput = 'Ошибка';
                     updateDisplay();
                     shouldResetDisplay = true;
                     return;
                 }
-                
+
                 const result = Function('"use strict"; return (' + expression + ')')();
-                
+
                 if (isNaN(result) || !isFinite(result)) {
                     currentInput = 'Ошибка';
                 } else {
                     currentInput = result.toString();
                 }
-                
+
                 updateDisplay();
                 shouldResetDisplay = true;
             } catch (error) {
@@ -226,7 +279,7 @@
                 clearDisplay();
                 return;
             }
-            
+
             if (currentInput.length > 1) {
                 currentInput = currentInput.slice(0, -1);
             } else {
@@ -235,10 +288,9 @@
             updateDisplay();
         }
 
-        // Поддержка клавиатуры
         document.addEventListener('keydown', function(event) {
             const key = event.key;
-            
+
             if (key >= '0' && key <= '9') {
                 appendNumber(key);
             } else if (key === '.') {
@@ -261,6 +313,23 @@
                 deleteLast();
             }
         });
+
+        const savedTheme = localStorage.getItem('calculator-theme') || 'light';
+
+        function setTheme(theme) {
+            const isDark = theme === 'dark';
+            document.body.classList.toggle('dark-theme', isDark);
+            themeToggleButton.textContent = isDark ? 'Светлая тема' : 'Тёмная тема';
+            themeToggleButton.setAttribute('aria-pressed', String(isDark));
+            localStorage.setItem('calculator-theme', theme);
+        }
+
+        themeToggleButton.addEventListener('click', () => {
+            const newTheme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+
+        setTheme(savedTheme);
     </script>
 </body>
 </html>
